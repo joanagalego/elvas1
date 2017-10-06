@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <title>Patrimonio de Elvas</title>
+        <link rel="stylesheet" href="src/leaflet.css">
+        <link rel="stylesheet" href="src/css/bootstrap.css">
+        <link rel="stylesheet" href="src/pluggins/easy-button.css">
+        <link rel="stylesheet" href="src/css/font-awesome.min.css">
+        <link rel="stylesheet" href="src/pluggins/leaflet.awesome-markers.css">
+       
+        <script src="src/leaflet-src.js"></script>
+        <script src="src/jquery-3.2.0.min.js"></script>
+        <script language="javascript"></script>
+        <script src="src/plugins/leaflet.ajax.min.js"></script>
+        <script src="data/points_elvas.geojson" type="text/javascript"></script>
+        <script src="data/JP.geojson" type="text/javascript"></script>
+        <script src="src/pluggins/leaflet-providers.js"></script>
+        <script src="src/pluggins/easy-button.js"></script>
+        <script src="src/pluggins/leaflet.awesome-markers.min.js"></script>
+        
+        <style>
+            #mapdiv {
+                height:90vh;
+                
+                   
+            
+            }
+            #btn {
+                width: 20%;
+                position: relative;
+                float: right;
+                background-color: aqua;
+            } 
+        </style>
+    </head>
+    <body>
+        <div id="side-bar" class="col-md-3"></div>
+        <div id="mapdiv" class="col-md-9"></div>
+        <input type="button" id="btn" value="Localiza-me!" onClick="javascript:getLocationLeaflet();">
+        <script>
+            var mymap;
+            var lyrOSM;
+            var lyrTopo;
+            var lyrSat;
+            var lyrStreet;
+            var lyrPointsElvas; 
+            var lyrLinesElvas;
+            var lyrPolygonsElvas;
+            var ctlAttribute;
+            var ctlScale;
+            var ctlLayers;
+            var objBasemaps;
+            var objOverlays;
+            var icnLAMtree;
+            var icnAMfontain;
+            var icnAMmus;
+            var icnAMil;
+            var match;
+            var patRel;
+            var museus;
+            var patMil;
+
+            
+            $(document).ready(function(){
+                
+                icnLAMtree = L.AwesomeMarkers.icon({icon:'flag', markerColor:'red'});
+                icnAMfountain=L.AwesomeMarkers.icon({icon:'flag', markerColor:'blue'})
+                icnAMmus=L.AwesomeMarkers.icon({icon:'flag', markerColor:'orange'})
+                icnAMil=L.AwesomeMarkers.icon({icon:'flag', markerColor:'black'})
+                
+                mymap = L.map('mapdiv', {center:[38.881491, -7.160715], zoom:13, attributionControl:false});
+                lyrOSM = L.tileLayer.provider('Hydda.Full');
+                lyrTopo= L.tileLayer.provider('Esri.WorldTopoMap');
+                lyrStreet = L.tileLayer.provider('HERE.hybridDay');
+                lyrSat = L.tileLayer.provider('Esri.WorldImagery');
+                mymap.addLayer(lyrOSM);
+                
+                objBasemaps={
+                    "Street Maps": lyrOSM,
+                    "Topo Map":lyrTopo,
+                    "Hybrid":lyrStreet,
+                    "Satellite":lyrSat
+                };
+                
+               
+               
+                
+                
+                
+
+                lyrPointsElvas=L.geoJSON.ajax('data/points_elvas.geojson');
+                lyrPointsElvas.on('data:loaded', function(){
+                    mymap.fitBounds(lyrPointsElvas.getBounds());
+                    
+                });
+                
+                fontes = L.geoJSON.ajax('data/points_elvas.geojson', {filter: picnicFilter, pointToLayer:returnElvasLine}).addTo(mymap);
+
+                function picnicFilter(feature) {
+                if (feature.properties.KML_FOLDER == "Fontes") return true
+                }
+                
+                museus = L.geoJSON.ajax('data/points_elvas.geojson', {filter: picFilter, pointToLayer:returnElvasMu}).addTo(mymap);
+
+                function picFilter(feature) {
+                if (feature.properties.KML_FOLDER == "Museus") return true
+                }
+                
+                
+                patRel = L.geoJSON.ajax('data/points_elvas.geojson', {filter: nicFilter, pointToLayer:returnElvasPR}).addTo(mymap);
+                
+                function nicFilter(feature) {
+                if (feature.properties.KML_FOLDER == "Patrimonio Religioso") return true
+                }
+                
+                patMil = L.geoJSON.ajax('data/points_elvas.geojson', {filter: nFilter, pointToLayer:returnElvasMil}).addTo(mymap);
+                
+                function nFilter(feature) {
+                if (feature.properties.KML_FOLDER == "Patrimonio Militar XVII, XVIII") return true
+                }
+
+                
+                lyrLinesElvas=L.geoJSON.ajax('data/lines_elvas.geojson').addTo(mymap);
+                lyrLinesElvas.on('data:loaded', function(){
+                   mymap.fitBounds(lyrLinesElvas.getBounds());
+                    
+                 });   
+                lyrPolygonsElvas=L.geoJSON.ajax('data/polygons_elvas.geojson').addTo(mymap);
+                lyrPolygonsElvas.on('data:loaded', function(){
+                   mymap.fitBounds(lyrPolygonsElvas.getBounds());
+                });
+                
+                objOverlays={
+                  "Fontes":fontes,
+                  "Patrimonio Religioso":patRel,
+                  "Museus":museus,
+                  "Patrimonio Militar XVII, XVIII":patMil,
+                  
+                  "Percursos":lyrLinesElvas,
+                  "Judearias e Mouraria":lyrPolygonsElvas
+                };
+                
+                
+                ctlLayers=L.control.layers(objBasemaps, objOverlays).addTo(mymap);
+                ctlEasybutton = L.easyButton('glyphicon-transfer', function(){
+                   ctlSidebar.toggle(); 
+                }).addTo(mymap);
+                
+                ctlAttribute=L.control.attribution({position:'bottomleft'}).addTo(mymap);
+                                
+      
+                ctlAttribute.addAttribution('© Joana Galego')
+                ctlScale=L.control.scale({position:'bottomleft'}).addTo(mymap);
+                
+                
+                  
+                });
+            function onLocationFound(e) {
+                     var radius = e.accuracy / 2;
+                     var location = e.latlng
+                     L.marker(location).addTo(mymap)
+                     L.circle(location, radius).addTo(mymap);
+                     
+                        
+                
+                  }
+
+                  function onLocationError(e) {
+                     alert(e.message);
+                  }
+
+                  function getLocationLeaflet() {
+                     mymap.on('locationfound', onLocationFound);
+                     mymap.on('locationerror', onLocationError);
+
+                     mymap.locate({setView: true, maxZoom: 16});
+                  }
+            
+            
+             function returnElvasLine(json,latlng){
+                
+                var att=json.properties;
+                
+                return L.marker(latlng,{icon:icnAMfountain}).bindTooltip("<h4>"+att.KML_FOLDER+"</h4>");
+                 }
+                 
+            function returnElvasPR(json,latlng){
+                
+                var att=json.properties;
+                
+                return L.marker(latlng,{icon:icnLAMtree}).bindTooltip("<h4>"+att.KML_FOLDER+"</h4>");
+                
+            }
+            
+            function returnElvasMu(json,latlng){
+                
+                var att=json.properties;
+                
+                return L.marker(latlng,{icon:icnAMmus}).bindTooltip("<h4>"+att.KML_FOLDER+"</h4>");
+                
+            }
+            
+             function returnElvasMil(json,latlng){
+                
+                var att=json.properties;
+                
+                return L.marker(latlng,{icon:icnAMil}).bindTooltip("<h4>"+att.KML_FOLDER+"</h4>");
+                
+            }
+            
+        </script>
+    </body>
+</html>
