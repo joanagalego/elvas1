@@ -23,6 +23,7 @@
         <style>
             #mapdiv {
                 height:90vh;
+                width: 100%;
                 
                    
             
@@ -66,21 +67,21 @@
             $(document).ready(function(){
                 
                 icnLAMtree = L.AwesomeMarkers.icon({icon:'flag', markerColor:'red'});
-                icnAMfountain=L.AwesomeMarkers.icon({icon:'flag', markerColor:'blue'})
+                icnAMfountain=L.AwesomeMarkers.icon({icon:'flag', markerColor:'dark blue'})
                 icnAMmus=L.AwesomeMarkers.icon({icon:'flag', markerColor:'orange'})
                 icnAMil=L.AwesomeMarkers.icon({icon:'flag', markerColor:'black'})
                 
                 mymap = L.map('mapdiv', {center:[38.881491, -7.160715], zoom:13, attributionControl:false});
-                lyrOSM = L.tileLayer.provider('Hydda.Full');
+                lyrOSM = L.tileLayer.provider('OpenStreetMap.Mapnik');
                 lyrTopo= L.tileLayer.provider('Esri.WorldTopoMap');
-                lyrStreet = L.tileLayer.provider('HERE.hybridDay');
+               
                 lyrSat = L.tileLayer.provider('Esri.WorldImagery');
                 mymap.addLayer(lyrOSM);
                 
                 objBasemaps={
-                    "Street Maps": lyrOSM,
+                    "OpenStreet Map": lyrOSM,
                     "Topo Map":lyrTopo,
-                    "Hybrid":lyrStreet,
+                    
                     "Satellite":lyrSat
                 };
                 
@@ -96,41 +97,45 @@
                     
                 });
                 
-                fontes = L.geoJSON.ajax('data/points_elvas.geojson', {filter: picnicFilter, pointToLayer:returnElvasLine}).addTo(mymap);
+                fontes = L.geoJSON.ajax('data/Pontos_teste.geojson', {filter: picnicFilter, pointToLayer:returnElvasLine}).addTo(mymap);
 
                 function picnicFilter(feature) {
                 if (feature.properties.KML_FOLDER == "Fontes") return true
                 }
                 
-                museus = L.geoJSON.ajax('data/points_elvas.geojson', {filter: picFilter, pointToLayer:returnElvasMu}).addTo(mymap);
+                museus = L.geoJSON.ajax('data/Pontos_teste.geojson', {filter: picFilter, pointToLayer:returnElvasMu}).addTo(mymap);
 
                 function picFilter(feature) {
                 if (feature.properties.KML_FOLDER == "Museus") return true
                 }
                 
                 
-                patRel = L.geoJSON.ajax('data/points_elvas.geojson', {filter: nicFilter, pointToLayer:returnElvasPR}).addTo(mymap);
+                patRel = L.geoJSON.ajax('data/Pontos_teste.geojson', {filter: nicFilter, pointToLayer:returnElvasPR}).addTo(mymap);
                 
                 function nicFilter(feature) {
                 if (feature.properties.KML_FOLDER == "Patrimonio Religioso") return true
                 }
                 
-                patMil = L.geoJSON.ajax('data/points_elvas.geojson', {filter: nFilter, pointToLayer:returnElvasMil}).addTo(mymap);
+                patMil = L.geoJSON.ajax('data/Pontos_teste.geojson', {filter: nFilter, pointToLayer:returnElvasMil}).addTo(mymap);
                 
                 function nFilter(feature) {
                 if (feature.properties.KML_FOLDER == "Patrimonio Militar XVII, XVIII") return true
                 }
 
                 
-                lyrLinesElvas=L.geoJSON.ajax('data/lines_elvas.geojson').addTo(mymap);
+                lyrLinesElvas=L.geoJSON.ajax('data/lines_elvas2.geojson', {color:'#04B431'}).addTo(mymap);
                 lyrLinesElvas.on('data:loaded', function(){
                    mymap.fitBounds(lyrLinesElvas.getBounds());
                     
-                 });   
-                lyrPolygonsElvas=L.geoJSON.ajax('data/polygons_elvas.geojson').addTo(mymap);
+                 }); 
+                
+                
+                lyrPolygonsElvas=L.geoJSON.ajax('data/polygons_elvas.geojson', {color:'#5F4C0B'}).addTo(mymap);
                 lyrPolygonsElvas.on('data:loaded', function(){
                    mymap.fitBounds(lyrPolygonsElvas.getBounds());
                 });
+              
+                
                 
                 objOverlays={
                   "Fontes":fontes,
@@ -144,9 +149,7 @@
                 
                 
                 ctlLayers=L.control.layers(objBasemaps, objOverlays).addTo(mymap);
-                ctlEasybutton = L.easyButton('glyphicon-transfer', function(){
-                   ctlSidebar.toggle(); 
-                }).addTo(mymap);
+                
                 
                 ctlAttribute=L.control.attribution({position:'bottomleft'}).addTo(mymap);
                                 
@@ -180,17 +183,223 @@
             
             
              function returnElvasLine(json,latlng){
+                 
                 
                 var att=json.properties;
+                 
+                if (att.Name=="Fonte de Sao Lourenco"){
+                    
                 
-                return L.marker(latlng,{icon:icnAMfountain}).bindTooltip("<h4>"+att.KML_FOLDER+"</h4>");
-                 }
+                
+                    var image=" <img src='http:\/\/discoverelvas.com\/wp-content\/uploads\/2017\/10\/Fonte-S-Lourenço2.jpg' width='200px'>";
+                    var link='<a href="http:\/\/discoverelvas.com\/fonte-de-s-lourenco\"+" target="_blank" >'
+                    
+                
+                    return L.marker(latlng,{icon:icnAMfountain}).bindPopup(att.Name+"</br>"+link+"Ver mais"+"</br>"+"</br>"+image ).openPopup();
+                }
+                else if (att.Name=="Fonte da Misericordia"){
+                    
+                
+                
+                    var image=" <img src='http:\/\/discoverelvas.com\/wp-content\/uploads\/2017\/10\/Fonte-da-Mesiricórdica2.jpg' width='200px'>";
+                    var link='<a href="http:\/\/discoverelvas.com\/fonte-da-misericordia\/\"+" target="_blank" >'
+                    
+                
+                    return L.marker(latlng,{icon:icnAMfountain}).bindPopup(att.Name+"</br>"+link+"Ver mais"+"</br>"+"</br>"+image ).openPopup();
+                }
+                 
+                 else if (att.Name=="Fonte de Santa Monica"){
+                    
+                
+                
+                    var image=" <img src='http:\/\/discoverelvas.com\/wp-content\/uploads\/2017\/10\/Fonte-Sta-Mónica.jpg' width='200px'>";
+                    var link='<a href="http:\/\/discoverelvas.com\/fonte-de-santa-monica\/\"+" target="_blank" >'
+                    
+                
+                    return L.marker(latlng,{icon:icnAMfountain}).bindPopup(att.Name+"</br>"+link+"Ver mais"+"</br>"+"</br>"+image ).openPopup();
+                }
+                 
+                  else if (att.Name=="Fonte de Sao Vicente"){
+                    
+                
+                
+               
+                    return L.marker(latlng,{icon:icnAMfountain}).bindPopup(att.Name ).openPopup();
+                }
+                 
+                  else if (att.Name=="Aqueduto da Amoreira"){
+                    
+                
+                
+                    var image=" <img src='http://discoverelvas.com/wp-content/uploads/2017/10/Aqueduto-Amoreira.jpg' width='200px'>";
+                    var link='<a href="http://discoverelvas.com/aqueduto-da-amoreira/"+" target="_blank" >'
+                    
+                
+                    return L.marker(latlng,{icon:icnAMfountain}).bindPopup(att.Name+"</br>"+link+"Ver mais"+"</br>"+"</br>"+image ).openPopup();
+                }
+                 
+                }
                  
             function returnElvasPR(json,latlng){
                 
-                var att=json.properties;
+             var att=json.properties;
                 
-                return L.marker(latlng,{icon:icnLAMtree}).bindTooltip("<h4>"+att.KML_FOLDER+"</h4>");
+                /*return L.marker(latlng,{icon:icnLAMtree}).bindTooltip("<h4>"+att.KML_FOLDER+"</h4>");*/
+                
+                
+                if (att.Name=="Antiga Se"){
+
+
+
+                        var image=" <img src='http://discoverelvas.com/wp-content/uploads/2017/10/Antiga-Se.jpg' width='200px'>";
+                        var link='<a href="http://discoverelvas.com/antiga-se-2/" >'
+
+
+                        return L.marker(latlng,{icon:icnAMfountain}).bindPopup(att.Name+"</br>"+link+"Ver mais"+"</br>"+"</br>"+image ).openPopup();
+                    }
+                 else if (att.Name=="Igreja das Dominicas"){
+
+
+
+                        var image=" <img src='http://discoverelvas.com/wp-content/uploads/2017/10/Domínicas5.jpg' width='200px'>";
+                        var link='<a href="http://discoverelvas.com/igreja-das-dominicas/" >'
+
+
+                        return L.marker(latlng,{icon:icnAMfountain}).bindPopup(att.Name+"</br>"+link+"Ver mais"+"</br>"+"</br>"+image ).openPopup();
+                    }
+                
+                 else if (att.Name=="Igreja da Santa Maria de Alcacova"){
+
+
+
+                        var image=" <img src='http://discoverelvas.com/wp-content/uploads/2017/10/Igreja-da-Alcáçova1.jpg' width='200px'>";
+                        var link='<a href="http://discoverelvas.com/igreja-de-santa-maria-da-alcacova/" >'
+
+
+                        return L.marker(latlng,{icon:icnAMfountain}).bindPopup(att.Name+"</br>"+link+"Ver mais"+"</br>"+"</br>"+image ).openPopup();
+                    }
+                else if (att.Name=="Igreja de Sao Joao da Corujeira"){
+
+
+
+                        var image=" <img src='http://discoverelvas.com/wp-content/uploads/2017/10/Igreja-de-S-João-da-Corujeira.jpg' width='200px'>";
+                        var link='<a href="http://discoverelvas.com/igreja-de-s-joao-da-corujeira/" >'
+
+
+                        return L.marker(latlng,{icon:icnAMfountain}).bindPopup(att.Name+"</br>"+link+"Ver mais"+"</br>"+"</br>"+image ).openPopup();
+                    }
+                 else if (att.Name=="Igreja dos Terceiros"){
+
+
+
+                        var image=" <img src='http://discoverelvas.com/wp-content/uploads/2017/10/Igreja-Terceiros.jpg' width='200px'>";
+                        var link='<a href="http://discoverelvas.com/igreja-dos-terceiros/" >'
+
+
+                        return L.marker(latlng,{icon:icnAMfountain}).bindPopup(att.Name+"</br>"+link+"Ver mais"+"</br>"+"</br>"+image ).openPopup();
+                    }
+                else if (att.Name=="Igreja de Sao Pedro"){
+
+
+
+
+                        return L.marker(latlng,{icon:icnAMfountain}).bindPopup(att.Name).openPopup();
+                    }
+                
+                 else if (att.Name=="Igreja de Sao Domingos"){
+
+
+
+                        var image=" <img src='http://discoverelvas.com/wp-content/uploads/2017/10/Igreja-de-S-Domingos1.jpg' width='200px'>";
+                        var link='<a href="http://discoverelvas.com/igreja-de-s-domingos/" >'
+
+
+                        return L.marker(latlng,{icon:icnAMfountain}).bindPopup(att.Name+"</br>"+link+"Ver mais"+"</br>"+"</br>"+image ).openPopup();
+                 }
+                
+                else if (att.Name=="Igreja de Sao Lourenco"){
+
+
+
+
+                        return L.marker(latlng,{icon:icnAMfountain}).bindPopup(att.Name).openPopup();
+                    }
+                else if (att.Name=="Igreja do Salvador - Colegio Jesui­ta"){
+
+
+
+
+                        return L.marker(latlng,{icon:icnAMfountain}).bindPopup(att.Name).openPopup();
+                    }
+                else if (att.Name=="Igreja da Nossa Senhora das Dores"){
+
+
+
+
+                        return L.marker(latlng,{icon:icnAMfountain}).bindPopup(att.Name).openPopup();
+                    }
+                 else if (att.Name=="Capela de Nossa Senhora da Nazare"){
+
+
+
+
+                        return L.marker(latlng,{icon:icnAMfountain}).bindPopup(att.Name).openPopup();
+                    }
+                
+                 else if (att.Name=="Igreja da Misericordia"){
+
+
+
+                        var image=" <img src='http://discoverelvas.com/wp-content/uploads/2017/10/Igreja-Mesiricórdia3.jpg' width='200px'>";
+                        var link='<a href="http://discoverelvas.com/igreja-da-misericordia/" >'
+
+
+                        return L.marker(latlng,{icon:icnAMfountain}).bindPopup(att.Name+"</br>"+link+"Ver mais"+"</br>"+"</br>"+image ).openPopup();
+                 }
+                
+                else if (att.Name=="Igreja da Misericordia"){
+
+
+
+                        var image=" <img src='http://discoverelvas.com/wp-content/uploads/2017/10/Igreja-Mesiricórdia3.jpg' width='200px'>";
+                        var link='<a href="http://discoverelvas.com/igreja-da-misericordia/" >'
+
+
+                        return L.marker(latlng,{icon:icnAMfountain}).bindPopup(att.Name+"</br>"+link+"Ver mais"+"</br>"+"</br>"+image ).openPopup();
+                 }
+                
+                else if (att.Name=="Capela da Nossa Senhora da Conceicao"){
+
+
+
+                        var image=" <img src='http://discoverelvas.com/wp-content/uploads/2017/10/Capela-de-Nª-Sª-da-Conceição2.jpg' width='200px'>";
+                        var link='<a href="http://discoverelvas.com/capela-na-sa-da-conceicao/" >'
+
+
+                        return L.marker(latlng,{icon:icnAMfountain}).bindPopup(att.Name+"</br>"+link+"Ver mais"+"</br>"+"</br>"+image ).openPopup();
+                 }
+                
+                else if (att.Name=="2a Cerca Islamica - Porta do Templo"){
+
+
+
+                        var image=" <img src='http://discoverelvas.com/wp-content/uploads/2017/10/Porta-do-Templo.jpg' width='200px'>";
+                        var link='<a href="http://discoverelvas.com/1a-cerca-islamica-porta-do-templo/" >'
+
+
+                        return L.marker(latlng,{icon:icnAMfountain}).bindPopup(att.Name+"</br>"+link+"Ver mais"+"</br>"+"</br>"+image ).openPopup();
+                 }
+                
+                else if (att.Name=="2a Cerca Islamica - Porta da Alcacova"){
+
+
+
+                        var image=" <img src='http://discoverelvas.com/wp-content/uploads/2017/10/Porta-da-Alcáçova1.jpg' width='200px'>";
+                        var link='<a href="http://discoverelvas.com/1a-cerca-islamica-porta-da-alcacova/" >'
+
+
+                        return L.marker(latlng,{icon:icnAMfountain}).bindPopup(att.Name+"</br>"+link+"Ver mais"+"</br>"+"</br>"+image ).openPopup();
+                 }
                 
             }
             
@@ -198,7 +407,49 @@
                 
                 var att=json.properties;
                 
-                return L.marker(latlng,{icon:icnAMmus}).bindTooltip("<h4>"+att.KML_FOLDER+"</h4>");
+                if (att.Name=="Museu Militar do Forte de Santa Luzia"){
+
+
+
+
+                        return L.marker(latlng,{icon:icnAMfountain}).bindPopup(att.Name).openPopup();
+                    }
+                else if (att.Name=="Museu Arte Sacra"){
+
+
+
+
+                        return L.marker(latlng,{icon:icnAMfountain}).bindPopup(att.Name).openPopup();
+                    }
+                else if (att.Name=="Museu Militar"){
+
+
+
+
+                        return L.marker(latlng,{icon:icnAMfountain}).bindPopup(att.Name).openPopup();
+                    }
+                 else if (att.Name=="Museu de Arte Contemporanea de Elvas"){
+
+
+
+
+                        return L.marker(latlng,{icon:icnAMfountain}).bindPopup(att.Name).openPopup();
+                    }
+                else if (att.Name=="Sinagoga"){
+
+
+
+
+                        return L.marker(latlng,{icon:icnAMfountain}).bindPopup(att.Name).openPopup();
+                    }
+                 else if (att.Name=="Torre Fernandina"){
+
+
+
+
+                        return L.marker(latlng,{icon:icnAMfountain}).bindPopup(att.Name).openPopup();
+                    }
+                 
                 
             }
             
@@ -206,10 +457,178 @@
                 
                 var att=json.properties;
                 
-                return L.marker(latlng,{icon:icnAMil}).bindTooltip("<h4>"+att.KML_FOLDER+"</h4>");
+               
+                 
+                 if (att.Name=="Conselho de Guerra"){
+
+
+
+                        var image=" <img src='http://discoverelvas.com/wp-content/uploads/2017/10/Conselho-de-Guerra.jpg' width='200px'>";
+                        var link='<a href="http://discoverelvas.com/conselho-de-guerra/" >'
+
+
+                        return L.marker(latlng,{icon:icnAMfountain}).bindPopup(att.Name+"</br>"+link+"Ver mais"+"</br>"+"</br>"+image ).openPopup();
+                    }
+                 else if (att.Name=="Quartel do Trem"){
+
+
+
+                        var image=" <img src='http://discoverelvas.com/wp-content/uploads/2017/10/Quartel-Trem1.jpg' width='200px'>";
+                        var link='<a href="http://discoverelvas.com/quartel-do-trem/" >'
+
+
+                        return L.marker(latlng,{icon:icnAMfountain}).bindPopup(att.Name+"</br>"+link+"Ver mais"+"</br>"+"</br>"+image ).openPopup();
+                    }
+                
+                 else if (att.Name=="Casa da Cultura - Pacos do Concelho"){
+
+
+
+                        var image=" <img src='http://discoverelvas.com/wp-content/uploads/2017/10/Casa-da-Cultura1.jpg' width='200px'>";
+                        var link='<a href="http://discoverelvas.com/casa-da-cultura-pacos-do-concelho/" >'
+
+
+                        return L.marker(latlng,{icon:icnAMfountain}).bindPopup(att.Name+"</br>"+link+"Ver mais"+"</br>"+"</br>"+image ).openPopup();
+                    }
+                else if (att.Name=="Quarteis dos Artilheiros"){
+
+
+
+                        var image=" <img src='http://discoverelvas.com/wp-content/uploads/2017/10/Quartel-dos-Artilheiros2.jpg' width='200px'>";
+                        var link='<a href="http://discoverelvas.com/quartel-dos-artilheiros/" >'
+
+
+                        return L.marker(latlng,{icon:icnAMfountain}).bindPopup(att.Name+"</br>"+link+"Ver mais"+"</br>"+"</br>"+image ).openPopup();
+                    }
+                 else if (att.Name=="Portas da Esquina"){
+
+
+
+                        var image=" <img src='http://discoverelvas.com/wp-content/uploads/2017/10/Porta-da-Esquina1.jpg' width='200px'>";
+                        var link='<a href="http://discoverelvas.com/porta-da-esquina/" >'
+
+
+                        return L.marker(latlng,{icon:icnAMfountain}).bindPopup(att.Name+"</br>"+link+"Ver mais"+"</br>"+"</br>"+image ).openPopup();
+                    }
+                else if (att.Name=="Casa das Barcas"){
+
+
+                        var image=" <img src='http://discoverelvas.com/wp-content/uploads/2017/10/Casa-das-Barcas.jpg' width='200px'>";
+                        var link='<a href="http://discoverelvas.com/casa-das-barcas/" >'
+
+
+                        return L.marker(latlng,{icon:icnAMfountain}).bindPopup(att.Name+"</br>"+link+"Ver mais"+"</br>"+"</br>"+image ).openPopup();
+                 
+                    }
+                
+                 else if (att.Name=="Castelo"){
+
+
+
+                        var image=" <img src='http://discoverelvas.com/wp-content/uploads/2017/10/Castelo-2.jpg' width='200px'>";
+                        var link='<a href="http://discoverelvas.com/castelo/" >'
+
+
+                        return L.marker(latlng,{icon:icnAMfountain}).bindPopup(att.Name+"</br>"+link+"Ver mais"+"</br>"+"</br>"+image ).openPopup();
+                 }
+            
+                 else if (att.Name=="Quartel de Sao Martinho"){
+
+
+
+
+                        return L.marker(latlng,{icon:icnAMfountain}).bindPopup(att.Name).openPopup();
+                    }
+                else if (att.Name=="Hospital Militar - Convento de Sao Joao de Deus"){
+
+
+
+
+                        return L.marker(latlng,{icon:icnAMfountain}).bindPopup(att.Name).openPopup();
+                    }
+                 else if (att.Name=="Baluarte de Santa Barbara"){
+
+
+
+
+                        return L.marker(latlng,{icon:icnAMfountain}).bindPopup(att.Name).openPopup();
+                    }
+                else if (att.Name=="Baluarte Sao Joao de Deus"){
+
+
+
+
+                        return L.marker(latlng,{icon:icnAMfountain}).bindPopup(att.Name).openPopup();
+                    }
+                 else if (att.Name=="Baluarte do Casarao"){
+
+
+
+
+                        return L.marker(latlng,{icon:icnAMfountain}).bindPopup(att.Name).openPopup();
+                    }
+                   else if (att.Name=="Portas de Olivenca"){
+
+
+
+
+                        return L.marker(latlng,{icon:icnAMfountain}).bindPopup(att.Name).openPopup();
+                    }
+                 else if (att.Name=="Portas de Sao Vicente"){
+
+
+
+
+                        return L.marker(latlng,{icon:icnAMfountain}).bindPopup(att.Name).openPopup();
+                    }
+                else if (att.Name=="Paiol de Nossa Senhora da Conceicao"){
+
+
+
+
+                        return L.marker(latlng,{icon:icnAMfountain}).bindPopup(att.Name).openPopup();
+                    }
+                 else if (att.Name=="Baluarte da Porta Velha"){
+
+
+
+
+                        return L.marker(latlng,{icon:icnAMfountain}).bindPopup(att.Name).openPopup();
+                    }
+                  else if (att.Name=="Fortin S Pedro"){
+
+
+
+
+                        return L.marker(latlng,{icon:icnAMfountain}).bindPopup(att.Name).openPopup();
+                    }
+                else if (att.Name=="Fortim de Sao Mamede"){
+
+
+
+
+                        return L.marker(latlng,{icon:icnAMfountain}).bindPopup(att.Name).openPopup();
+                    }
+                 else if (att.Name=="Fortim de Sao Domingos"){
+
+
+
+
+                        return L.marker(latlng,{icon:icnAMfountain}).bindPopup(att.Name).openPopup();
+                    }
+                 
+                 
                 
             }
             
+             /*function onEachFeature (feature, layer) {
+                        var att=json.properties;
+                         
+                        layer.bindPopup("<h4>"+feaure.propertiest.KML_FOLDER+"</h4>").openPopup();
+                   
+                    }
+               */
+                    
         </script>
     </body>
 </html>
